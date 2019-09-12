@@ -6,19 +6,25 @@ countdown 倒计时按钮组件用于提供一个可点击后进入倒计时状�
 
 #### 组件示例
 
-<ele-xy-countdown-button style="margin-top:20px;" @click="onClick" :is-send.sync="isSend"></ele-xy-countdown-button>
+<ele-xy-countdown-button style="margin-top:20px;" @click="sendCode" :send-status.sync="sendStatus"></ele-xy-countdown-button>
 
 <script>
 export default {
   data() {
     return {
-      isSend: false,
+      // 验证码发送状态，默认是 init，初始状态
+      sendStatus: 'init',
     }
   },
   methods: {
-    onClick(val) {
+    sendCode(val) {
       setTimeout(() => {
-        this.isSend = true;
+        let noError = true
+        if (noError) {
+          this.sendStatus = 'sended';
+        } else {
+          this.sendStatus = 'init';
+        }
       }, 1000)
     }
   }
@@ -28,36 +34,29 @@ export default {
 #### 代码示例
 
 ```html
-<xy-countdown-button @click="onClick" :is-send.sync="isSend"></xy-countdown-button>
+<xy-countdown-button @click="sendCode" :send-status.sync="sendStatus" />
 ```
 
 ```javascript
 export default {
   data() {
     return {
-      isSend: false,
+      // 验证码发送状态，默认是 init，初始状态
+      sendStatus: 'init',
     }
   },
   methods: {
-    onClick() {
+    sendCode(val) {
       // 模拟接口请求
       setTimeout(() => {
-        this.isSend = true;
+        if (hasNoError) {
+          // 把状态设为 'sended'，按钮就会进入倒计时状态
+          this.sendStatus = 'sended';
+        } else {
+          // 如果有错误，把状态设为 'init' 就可以恢复按钮状态
+          this.sendStatus = 'init';
+        }
       }, 1000)
-      // 真实接口请求
-      // this.$post('api', {phone: input}).then(res => {
-      //   if (res) {
-      //     this.isSend = true;
-      //   } else {
-      //     this.$message({
-      //       message: res.message,
-      //       type: 'error',
-      //     });
-      //     this.isSend = false;
-      //   }
-      // }).catch(() => {
-      //   this.isSend = false;
-      // })
     }
   }
 }
@@ -67,5 +66,6 @@ export default {
 
 | 属性 | 类型 | 说明 | 默认值 |
 | ------| ------ | ------ | :------: |
-| isSend | Boolean | 用于提供给倒计时按钮，控制开始倒计时的状态，如果为 true，则按钮开始倒计时，当执行一些错误逻辑后，需要还原成 false 状态，正常逻辑情况下无需改动 | false |
-| click | Function | 按钮点击后触发的事件，你需要在正常逻辑情况下，手动把 isSend 状态修改为 true 来开始倒计时 | Function |
+| sendStatus | String | 用于控制按钮状态。'init'： 初始状态；'sending'：发送中状态；'sended'：进入倒计时状态。| 'init' |
+| click | Function | 按钮点击后触发的事件，你可以在这个事件中改变按钮状态 | Function |
+| text | String | 设置按钮默认文字 | '获取验证码' |

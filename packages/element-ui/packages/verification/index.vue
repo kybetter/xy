@@ -7,7 +7,7 @@
           <span class="title">安全验证</span>
         </div>
         <div class="box-tips">
-          <p v-if="isSendCode">验证码短信已发送至：{{ telephone }}，请注意查收</p>
+          <p v-if="isSended">验证码短信已发送至：{{ telephone }}，请注意查收</p>
           <p v-else>为了保障账户安全，请进行安全验证，接收验证码手机号：{{ telephone }}</p>
         </div>
         <div class="t-MT30">
@@ -18,13 +18,13 @@
             autocomplete="off"
             v-model="code"
           />
-          <xy-countdown-button @click="sendCode" :is-send.sync="isSend"></xy-countdown-button>
+          <xy-countdown-button @click="sendCode" :send-status.sync="innerSendStatus"></xy-countdown-button>
         </div>
         <el-button
           class="verify-button"
           type="primary"
           @click="verifyCode"
-          :disabled="code.length !== 6"
+          :disabled="isDisabled"
         >
           <span>确定</span>
         </el-button>
@@ -42,8 +42,14 @@ export default {
     XyCountdownButton,
   },
   props: {
-    isSendCode: Boolean,
-    telephone: [String, Number],
+    sendStatus: {
+      type: String,
+      default: 'init',
+    },
+    telephone: {
+      type: [String, Number],
+      default: '',
+    },
     value: {
       type: String,
       default: ''
@@ -52,8 +58,16 @@ export default {
   data() {
     return {
       code: '',
-      isSend: false,
+      innerSendStatus: this.sendStatus,
     };
+  },
+  computed: {
+    isDisabled() {
+      return this.code.length !== 6;
+    },
+    isSended() {
+      return this.sendStatus === 'sended';
+    },
   },
   mounted() {
     this.code = this.value;
@@ -65,14 +79,8 @@ export default {
     value(val) {
       this.code = val;
     },
-    isSendCode(val) {
-      this.isSend = val;
-    },
-    isSend(val) {
-      if (val === false) {
-        this.$emit('update:isSendCode', false);
-        this.code = '';
-      }
+    sendStatus(status) {
+      this.innerSendStatus = status;
     },
   },
   methods: {
